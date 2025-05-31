@@ -1,0 +1,793 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Social Networking API",
+    "description": "API documentation for Social Networking Application"
+  },
+  "host": "localhost:3300",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "paths": {
+    "/users/signup": {
+      "post": {
+        "summary": "Register a new user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "User details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "gender": { "type": "string", "enum": ["Male", "Female"] },
+                "password": { "type": "string" }
+              },
+              "required": ["name", "email", "gender", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "User created successfully" },
+          "400": { "description": "Validation error" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/users/signin": {
+      "post": {
+        "summary": "User login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "credentials",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login successful" },
+          "400": { "description": "Invalid credentials" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "summary": "User logout",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Logout successful" },
+          "400": { "description": "Invalid token" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/profiles/addProfile": {
+      "post": {
+        "summary": "Add a new user profile",
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "avatar",
+            "type": "file",
+            "description": "User profile picture",
+            "required": false
+          },
+          {
+            "in": "body",
+            "name": "profile",
+            "description": "Profile details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nickname": { "type": "string" },
+                "tagline": { "type": "string" },
+                "occupation": { "type": "string" },
+                "interests": { "type": "string" },
+                "username": { "type": "string" }
+              },
+              "required": ["nickname", "occupation", "username"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile added successfully" },
+          "500": { "description": "Failed to add profile" }
+        }
+      }
+    },
+    "/profiles/getProfile": {
+      "get": {
+        "summary": "Get user profile",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile retrieved successfully" },
+          "404": { "description": "Profile not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/profiles/get-all-details": {
+      "get": {
+        "summary": "Get all profile details by username",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "type": "string",
+            "description": "Username to fetch profile details",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile details retrieved successfully" },
+          "404": { "description": "Profile not found or wrong username" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/profiles/update-profile": {
+      "put": {
+        "summary": "Update user profile",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "profile",
+            "description": "Profile details to update",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nickname": { "type": "string" },
+                "tagline": { "type": "string" },
+                "occupation": { "type": "string" },
+                "interests": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile updated successfully" },
+          "404": { "description": "Profile not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/otp/request-otp": {
+      "post": {
+        "summary": "Request an OTP for password reset",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for user authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "email": { "type": "string" }
+              }
+            }
+          },
+          "500": { "description": "Failed to send OTP" }
+        }
+      }
+    },
+    "/otp/reset-password": {
+      "post": {
+        "summary": "Reset password using OTP",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for user authentication"
+          },
+          {
+            "in": "body",
+            "name": "resetDetails",
+            "description": "Details for resetting password",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": { "type": "string", "description": "The OTP sent to the user's email" },
+                "password": { "type": "string", "description": "New password" }
+              },
+              "required": ["otp", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Password reset successfully" },
+          "400": { "description": "Invalid OTP or password" },
+          "500": { "description": "Failed to reset password" }
+        }
+      }
+    },
+
+    "/posts/add": {
+      "post": {
+        "summary": "Add a new post",
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "imageUrl",
+            "type": "file",
+            "description": "Image URL for the post",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "post",
+            "description": "Post details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "caption": { "type": "string", "description": "Caption for the post" }
+              },
+              "required": ["caption"]
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": { "description": "Post created successfully" },
+          "500": { "description": "Failed to create post" }
+        }
+      }
+    },
+    "/posts/delete": {
+      "delete": {
+        "summary": "Delete a post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postId",
+            "type": "string",
+            "description": "ID of the post to delete",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": { "description": "Post deleted successfully" },
+          "404": { "description": "Post not found" },
+          "500": { "description": "Failed to delete post" }
+        }
+      }
+    },
+    "/posts/update": {
+      "put": {
+        "summary": "Update a post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postId",
+            "type": "string",
+            "description": "ID of the post to update",
+            "required": true
+          },
+          {
+            "in": "formData",
+            "name": "imageUrl",
+            "type": "file",
+            "description": "Updated image URL",
+            "required": false
+          },
+          {
+            "in": "body",
+            "name": "post",
+            "description": "Updated post details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "caption": { "type": "string", "description": "Updated caption for the post" }
+              }
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Post updated successfully" },
+          "404": { "description": "Post not found or unauthorized" },
+          "500": { "description": "Failed to update post" }
+        }
+      }
+    },
+    "/posts/{postId}": {
+      "get": {
+        "summary": "Get post by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postId",
+            "type": "string",
+            "description": "ID of the post to retrieve",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": { "type": "string" },
+                "caption": { "type": "string" },
+                "imageUrl": { "type": "string" }
+              }
+            }
+          },
+          "404": { "description": "Post not found or unauthorized" },
+          "500": { "description": "Failed to retrieve post" }
+        }
+      }
+    },
+    "/posts/all": {
+      "post": {
+        "summary": "Get all posts by user IDs",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "userIds",
+            "description": "Array of user IDs to retrieve posts for",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posts retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "userId": { "type": "string" },
+                  "caption": { "type": "string" },
+                  "imageUrl": { "type": "string" }
+                }
+              }
+            }
+          },
+          "404": { "description": "No posts found for the provided user IDs" },
+          "500": { "description": "Failed to retrieve posts" }
+        }
+      }
+    },
+    "/posts/": {
+      "get": {
+        "summary": "Get all posts by the current user",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "description": "Bearer token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posts retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "userId": { "type": "string" },
+                  "caption": { "type": "string" },
+                  "imageUrl": { "type": "string" }
+                }
+              }
+            }
+          },
+          "404": { "description": "No posts found for this user" },
+          "500": { "description": "Failed to retrieve posts" }
+        }
+      }
+    },
+
+    "/comments/{postId}": {
+    "get": {
+      "summary": "Get all comments for a post",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "postId",
+          "required": true,
+          "type": "string",
+          "description": "ID of the post to retrieve comments"
+        },
+        {
+          "in": "header",
+          "name": "Authorization",
+          "type": "string",
+          "required": true,
+          "description": "Bearer token for user authentication"
+        }
+      ],
+      "responses": {
+        "200": { "description": "Comments retrieved successfully" },
+        "404": { "description": "No comments found for the post" },
+        "500": { "description": "Internal server error" }
+      }
+    },
+    "post": {
+      "summary": "Add a comment to a post",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "postId",
+          "required": true,
+          "type": "string",
+          "description": "ID of the post to add a comment"
+        },
+        {
+          "in": "body",
+          "name": "comment",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "comment": { "type": "string", "description": "Content of the comment" }
+            },
+            "required": ["comment"]
+          }
+        },
+        {
+          "in": "header",
+          "name": "Authorization",
+          "type": "string",
+          "required": true,
+          "description": "Bearer token for user authentication"
+        }
+      ],
+      "responses": {
+        "201": { "description": "Comment added successfully" },
+        "400": { "description": "Invalid input" },
+        "500": { "description": "Internal server error" }
+      }
+    }
+  },
+  "/comments/{commentId}": {
+    "delete": {
+      "summary": "Delete a comment",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "commentId",
+          "required": true,
+          "type": "string",
+          "description": "ID of the comment to delete"
+        },
+        {
+          "in": "header",
+          "name": "Authorization",
+          "type": "string",
+          "required": true,
+          "description": "Bearer token for user authentication"
+        }
+      ],
+      "responses": {
+        "204": { "description": "Comment deleted successfully" },
+        "404": { "description": "Comment not found" },
+        "500": { "description": "Internal server error" }
+      }
+    },
+    "put": {
+      "summary": "Update a comment",
+      "parameters": [
+        {
+          "in": "path",
+          "name": "commentId",
+          "required": true,
+          "type": "string",
+          "description": "ID of the comment to update"
+        },
+        {
+          "in": "body",
+          "name": "comment",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "data": { "type": "string", "description": "Updated content of the comment" }
+            },
+            "required": ["data"]
+          }
+        },
+        {
+          "in": "header",
+          "name": "Authorization",
+          "type": "string",
+          "required": true,
+          "description": "Bearer token for user authentication"
+        }
+      ],
+      "responses": {
+        "200": { "description": "Comment updated successfully" },
+        "404": { "description": "Comment not found or unauthorized" },
+        "500": { "description": "Internal server error" }
+      }
+    }
+  },
+
+  "/likes/toggle/{postId}": {
+  "post": {
+    "summary": "Toggle a like or unlike for a post",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "postId",
+        "required": true,
+        "type": "string",
+        "description": "ID of the post to like/unlike"
+      },
+      {
+        "in": "body",
+        "name": "opinion",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "opinion": { "type": "string", "enum": ["Like", "Unlike"], "description": "User's opinion (like/unlike)" }
+          },
+          "required": ["opinion"]
+        }
+      },
+      {
+        "in": "header",
+        "name": "Authorization",
+        "type": "string",
+        "required": true,
+        "description": "Bearer token for user authentication"
+      }
+    ],
+    "responses": {
+      "201": { "description": "Opinion added successfully" },
+      "400": { "description": "Validation error or already reacted" },
+      "404": { "description": "Post not found" },
+      "500": { "description": "Internal server error" }
+    }
+  }
+},
+"/likes/{id}": {
+  "get": {
+    "summary": "Get all likes and unlikes for a post",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "id",
+        "required": true,
+        "type": "string",
+        "description": "ID of the post to retrieve likes/unlikes"
+      },
+      {
+        "in": "header",
+        "name": "Authorization",
+        "type": "string",
+        "required": true,
+        "description": "Bearer token for user authentication"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Likes and unlikes retrieved successfully",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "postId": { "type": "string" },
+            "likes": { "type": "integer", "description": "Count of likes" },
+            "unlikes": { "type": "integer", "description": "Count of unlikes" }
+          }
+        }
+      },
+      "404": { "description": "Post not found or no reactions available" },
+      "500": { "description": "Internal server error" }
+    }
+  }
+},
+  
+"/friends/send/{to}": {
+  "post": {
+    "summary": "Send a friend request",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "to",
+        "required": true,
+        "type": "string",
+        "description": "ID of the user to send the friend request to"
+      },
+      {
+        "in": "header",
+        "name": "Authorization",
+        "type": "string",
+        "required": true,
+        "description": "Bearer token for user authentication"
+      }
+    ],
+    "responses": {
+      "201": { "description": "Friend request sent successfully" },
+      "500": { "description": "Failed to send friend request" }
+    }
+  }
+},
+"/friends/pending-requests": {
+  "get": {
+    "summary": "Get pending friend requests",
+    "parameters": [
+      {
+        "in": "header",
+        "name": "Authorization",
+        "type": "string",
+        "required": true,
+        "description": "Bearer token for user authentication"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Pending friend requests retrieved successfully",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sender": { "type": "string", "description": "ID of the user who sent the request" },
+              "to": { "type": "string", "description": "ID of the user who received the request" },
+              "status": { "type": "string", "enum": ["Undecided", "Accept", "Reject"], "description": "Current status of the request" }
+            }
+          }
+        }
+      },
+      "500": { "description": "Failed to retrieve pending friend requests" }
+    }
+  }
+},
+"/friends/response-to-request/{friendId}": {
+  "post": {
+    "summary": "Respond to a friend request",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "friendId",
+        "required": true,
+        "type": "string",
+        "description": "ID of the friend request"
+      },
+      {
+        "in": "body",
+        "name": "response",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "decision": { "type": "string", "enum": ["Accept", "Reject"], "description": "Decision on the friend request" }
+          },
+          "required": ["decision"]
+        }
+      },
+      {
+        "in": "header",
+        "name": "Authorization",
+        "type": "string",
+        "required": true,
+        "description": "Bearer token for user authentication"
+      }
+    ],
+    "responses": {
+      "200": { "description": "Friend request responded successfully" },
+      "400": { "description": "Invalid decision value" },
+      "500": { "description": "Failed to respond to friend request" }
+    }
+  }
+},
+"/friends/get-friends/{userId}": {
+  "get": {
+    "summary": "Get friends of a user",
+    "parameters": [
+      {
+        "in": "path",
+        "name": "userId",
+        "required": true,
+        "type": "string",
+        "description": "ID of the user to retrieve friends for"
+      },
+      {
+        "in": "header",
+        "name": "Authorization",
+        "type": "string",
+        "required": true,
+        "description": "Bearer token for user authentication"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Friends retrieved successfully",
+        "schema": {
+          "type": "array",
+          "items": { "type": "string", "description": "User ID of a friend" }
+        }
+      },
+      "500": { "description": "Failed to retrieve friends" }
+    }
+  }
+}
+  }
+}
